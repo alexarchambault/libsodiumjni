@@ -38,6 +38,11 @@ object libsodiumjni extends MavenModule with JniModule with JniPublishModule wit
     val lib = dir / "libsodium" / "x64" / "Release" / "v143" / "dynamic" / "libsodium"
     super.windowsLinkingLibs() ++ Seq(lib.toString)
   }
+  def windowsLinkingStaticLibs = T {
+    val dir = windowsLibSodiumDistDir()
+    val lib = dir / "libsodium" / "x64" / "Release" / "v143" / "static" / "libsodium"
+    super.windowsLinkingStaticLibs() ++ Seq(lib.toString)
+  }
   def windowsCOptions = T {
     val dir = windowsLibSodiumDistDir()
     val headerDir = dir / "libsodium" / "include"

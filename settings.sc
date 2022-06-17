@@ -172,6 +172,7 @@ trait JniWindowsModule extends Module {
 
   def windowsDllName: T[String]
   def windowsLinkingLibs = T(Seq.empty[String])
+  def windowsLinkingStaticLibs = T(Seq.empty[String])
 
   def windowsJavaHome = T {
     val dir = os.Path(sys.props("java.home"), os.pwd)
@@ -257,10 +258,11 @@ trait JniWindowsModule extends Module {
     val libNeedsUpdate =
       !os.isFile(output) || allObjFiles.exists(f => os.mtime(output) < os.mtime(f))
     if (libNeedsUpdate) {
+      val libsArgs = windowsLinkingStaticLibs().map(l => l + ".lib")
       val script =
         s"""@call "$vcvars"
            |if %errorlevel% neq 0 exit /b %errorlevel%
-           |lib "/out:$fileName" ${allObjFiles.map(f => "\"" + f.toString + "\"").mkString(" ")}
+           |lib "/out:$fileName" ${libsArgs.mkString(" ")} ${allObjFiles.map(f => "\"" + f.toString + "\"").mkString(" ")}
            |""".stripMargin
       val scriptPath = T.dest / "run-lib.bat"
       os.write.over(scriptPath, script.getBytes, createFolders = true)
